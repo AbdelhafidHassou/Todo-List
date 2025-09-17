@@ -11,19 +11,36 @@ import {
   selectTodos,
   selectTodoStats,
 } from "../store/selectors";
-import {setIsAddingTodo} from "../store/todoSlice"
+import {
+  clearCompleted,
+  markAllComplete,
+  setFilter,
+  setIsAddingTodo,
+} from "../store/todoSlice";
 
 function TodoApp() {
   const todos = useSelector(selectTodos);
-  const filtredTodos = useSelector(selectFilteredTodos);
+  const filteredTodos = useSelector(selectFilteredTodos);
   const stats = useSelector(selectTodoStats);
   const filter = useSelector(SelectFilter);
   const isAddingTodo = useSelector(selectIsAddingTodo);
   const dispatch = useDispatch();
 
+  const handleFilterChange = (newFilter) => {
+    dispatch(setFilter(newFilter));
+  };
+
   const handleAddTodoButton = () => {
     dispatch(setIsAddingTodo(true));
-    console.log(isAddingTodo);
+    //console.log(isAddingTodo);
+  };
+
+  const handleMarkComplete = () => {
+    dispatch(markAllComplete());
+  };
+
+  const handleClearCompleted = () => {
+    dispatch(clearCompleted());
   };
 
   return (
@@ -85,7 +102,10 @@ function TodoApp() {
           {/* Action bar */}
           <div className="p-6 border-b border-gray-300">
             <div className="flex items-center justify-between mb-4">
-              <button className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium cursor-pointer" onClick={handleAddTodoButton}>
+              <button
+                className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium cursor-pointer"
+                onClick={handleAddTodoButton}
+              >
                 <Plus size={20} /> Add Todo
               </button>
 
@@ -93,32 +113,37 @@ function TodoApp() {
               {stats.total > 0 && (
                 <div className="flex items-center gap-2">
                   {stats.completed > 0 && (
-                      <button className="flex items-center gap-3 text-red-600 hover:text-red-700 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors duration-200 text-sm">
-                        <Trash2 size={16} /> Clear Completed
-                      </button>
-                    )}
+                    <button className="flex items-center gap-3 text-red-600 hover:text-red-700 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors duration-200 text-sm" onClick={handleClearCompleted}>
+                      <Trash2 size={16} /> Clear Completed
+                    </button>
+                  )}
 
                   {stats.active > 0 && (
-                    <button className="flex items-center gap-3 text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors duration-200 text-sm">
-                      <CheckCircle2 size={16} /> Mark All Completed
+                    <button className="flex items-center gap-3 text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors duration-200 text-sm" onClick={handleMarkComplete}>
+                      <CheckCircle2 size={16} />{" "}
+                      Mark All Completed
                     </button>
                   )}
                 </div>
               )}
             </div>
             {/* Todo filter */}
-            <TodoFilters currentFilter={filter} stats={stats} />
+            <TodoFilters
+              currentFilter={filter}
+              stats={stats}
+              onFilterChange={handleFilterChange}
+            />
           </div>
           {/* Todo form */}
           {isAddingTodo && (
             <div className="p-6 border-b border-gray-300 bg-gray-100">
-              <TodoForm placeholder="What is your plan"/>
+              <TodoForm placeholder="What is your plan" />
             </div>
           )}
 
           {/* Todo list */}
           <div className="max-h-96 overflow-y-auto">
-            {filtredTodos.length === 0 ? (
+            {filteredTodos.length === 0 ? (
               <div className="p-12 text-center">
                 {todos.length === 0 ? (
                   <div className="text-gray-600">
@@ -136,8 +161,7 @@ function TodoApp() {
                       No {filter} Todos
                       <p className="text-sm">
                         {filter === "completed" && "All todos are completed"}
-                        {filter === "active" &&
-                          "No completed todos yet, keep going"}
+                        {filter === "active" && "No completed todos yet, keep going"}
                       </p>
                     </p>
                   </div>
@@ -145,7 +169,7 @@ function TodoApp() {
               </div>
             ) : (
               <div className="divide-y divide-gray-300">
-                {filtredTodos.map((todo, index) => {
+                {filteredTodos.map((todo, index) => {
                   return <TodoItem key={todo.id} todo={todo} index={index} />;
                 })}
               </div>

@@ -27,7 +27,7 @@ function TodoItem({ todo, index }) {
   };
 
   const handleUpdate = (text) => {
-    dispatch(updateTodo({id: todo.id, updates: {text: text.text()}}));
+    dispatch(updateTodo({id: todo.id, updates: {text: text.trim()}}));
     setIsEditing(false);
   }
 
